@@ -1,0 +1,706 @@
+draw_self();
+
+/* Create shadows behind rectangular wall objects with GML
+
+	 \ | /
+	--   --
+	 / | \
+*/
+
+var processedWalls = ds_list_create();
+var walls = ds_list_create();
+
+for (var i = 0; i < instance_number(obj_void); i++)
+{
+    var wall = instance_find(obj_void, i);
+    
+    if (point_distance(wall.x, wall.y, self.x, self.y) < visionDistance)
+	{
+
+	    // Check if the wall has been processed
+	    if (ds_list_find_index(processedWalls, wall.id) != -1)
+		{
+	        continue; // Skip processing this wall
+	    }
+		
+		draw_set_alpha(1.0);
+		draw_primitive_begin(pr_trianglelist);
+
+		// Coordinates of the square corners
+		var topLeftX = wall.bbox_left;
+		var topLeftY = wall.bbox_top;
+
+		var topRightX = wall.bbox_right;
+		var topRightY = wall.bbox_top;
+
+		var bottomLeftX = wall.bbox_left;
+		var bottomLeftY = wall.bbox_bottom;
+
+		var bottomRightX = wall.bbox_right;
+		var bottomRightY = wall.bbox_bottom;
+
+		// Coordinates of the point
+		var pointX = self.x + 51;
+		var pointY = self.y + 51;
+
+		if (pointX < topLeftX && pointY <= topLeftY) // TOP LEFT
+		{
+			draw_set_alpha(1.0);
+
+			draw_primitive_begin(pr_trianglelist);
+			
+			var bottomLeftAngle = arctan(getSlope(bottomLeftX, bottomLeftY, pointX, pointY));
+			var topRightAngle = arctan(getSlope(topRightX, topRightY, pointX, pointY));
+
+			var bottomLeftExtendedX = bottomLeftX + visionDistance * cos(bottomLeftAngle)
+			var bottomLeftExtendedY = bottomLeftY + visionDistance * sin(bottomLeftAngle)
+
+			var topRightExtendedX = topRightX + visionDistance * cos(topRightAngle);
+			var topRightExtendedY = topRightY + visionDistance * sin(topRightAngle);
+
+			// Triangle
+			draw_vertex(bottomLeftExtendedX, bottomLeftExtendedY);
+			draw_vertex(bottomRightX, bottomRightY);
+			draw_vertex(bottomLeftX, bottomLeftY);
+			
+			// Center Triangle
+			draw_vertex(bottomLeftExtendedX, bottomLeftExtendedY);
+			draw_vertex(bottomRightX, bottomRightY);
+			draw_vertex(topRightExtendedX, topRightExtendedY);
+			
+			// Triangle
+			draw_vertex(topRightX, topRightY);
+			draw_vertex(bottomRightX, bottomRightY);
+			draw_vertex(topRightExtendedX, topRightExtendedY);
+			
+			draw_primitive_end();
+			
+			
+			
+			draw_set_alpha(0.25);
+			
+			draw_primitive_begin(pr_trianglelist);
+			
+			var topRightAngle = arctan(getSlope(topRightX, topRightY, pointX, pointY)*0.9);
+			var bottomLeftAngle = arctan(getSlope(bottomLeftX, bottomLeftY, pointX, pointY)*1.1);
+
+			// Shadow Triangle
+			draw_vertex(topRightX + visionDistance * cos(topRightAngle), topLeftY + visionDistance * sin(topRightAngle));
+			draw_vertex(topRightExtendedX, topRightExtendedY);
+			draw_vertex(topRightX, topRightY);
+			
+			// Shadow Triangle
+			draw_vertex(bottomLeftX + visionDistance * cos(bottomLeftAngle), bottomLeftY + visionDistance * sin(bottomLeftAngle));
+			draw_vertex(bottomLeftExtendedX, bottomLeftExtendedY);
+			draw_vertex(bottomLeftX, bottomLeftY);
+			
+			var topRightAngle = arctan(getSlope(topRightX, topRightY, pointX, pointY)*0.8);
+			var bottomLeftAngle = arctan(getSlope(bottomLeftX, bottomLeftY, pointX, pointY)*1.2);
+
+			// Shadow Triangle
+			draw_vertex(topRightX + visionDistance * cos(topRightAngle), topLeftY + visionDistance * sin(topRightAngle));
+			draw_vertex(topRightExtendedX, topRightExtendedY);
+			draw_vertex(topRightX, topRightY);
+			
+			// Shadow Triangle
+			draw_vertex(bottomLeftX + visionDistance * cos(bottomLeftAngle), bottomLeftY + visionDistance * sin(bottomLeftAngle));
+			draw_vertex(bottomLeftExtendedX, bottomLeftExtendedY);
+			draw_vertex(bottomLeftX, bottomLeftY);
+			
+			var topRightAngle = arctan(getSlope(topRightX, topRightY, pointX, pointY)*0.7);
+			var bottomLeftAngle = arctan(getSlope(bottomLeftX, bottomLeftY, pointX, pointY)*1.3);
+
+			// Shadow Triangle
+			draw_vertex(topRightX + visionDistance * cos(topRightAngle), topLeftY + visionDistance * sin(topRightAngle));
+			draw_vertex(topRightExtendedX, topRightExtendedY);
+			draw_vertex(topRightX, topRightY);
+			
+			// Shadow Triangle
+			draw_vertex(bottomLeftX + visionDistance * cos(bottomLeftAngle), bottomLeftY + visionDistance * sin(bottomLeftAngle));
+			draw_vertex(bottomLeftExtendedX, bottomLeftExtendedY);
+			draw_vertex(bottomLeftX, bottomLeftY);
+			
+			draw_primitive_end();
+		}
+		else if (pointX > topRightX && pointY < topRightY) // TOP RIGHT
+		{
+			draw_set_alpha(1.0);
+
+			draw_primitive_begin(pr_trianglelist);
+			
+			var topLeftAngle = arctan(getSlope(topLeftX, topLeftY, pointX, pointY));
+			var bottomRightAngle = arctan(getSlope(bottomRightX, bottomRightY, pointX, pointY));
+
+			var topLeftExtendedX = topLeftX - visionDistance * cos(topLeftAngle)
+			var topLeftExtendedY = topLeftY - visionDistance * sin(topLeftAngle)
+
+			var bottomRightExtendedX = bottomRightX - visionDistance * cos(bottomRightAngle);
+			var bottomRightExtendedY = bottomRightY - visionDistance * sin(bottomRightAngle);
+
+			// Triangle
+			draw_vertex(topLeftExtendedX, topLeftExtendedY);
+			draw_vertex(bottomLeftX, bottomLeftY);
+			draw_vertex(topLeftX, topLeftY);
+			
+			// Center Triangle
+			draw_vertex(topLeftExtendedX, topLeftExtendedY);
+			draw_vertex(bottomLeftX, bottomLeftY);
+			draw_vertex(bottomRightExtendedX, bottomRightExtendedY);
+			
+			// Triangle
+			draw_vertex(bottomRightX, bottomRightY);
+			draw_vertex(bottomLeftX, bottomLeftY);
+			draw_vertex(bottomRightExtendedX, bottomRightExtendedY);
+			
+			draw_primitive_end();
+			
+			
+			
+			draw_set_alpha(0.25);
+			
+			draw_primitive_begin(pr_trianglelist);
+			
+			var topLeftAngle = arctan(getSlope(topLeftX, topLeftY, pointX, pointY)*0.9);
+			var bottomRightAngle = arctan(getSlope(bottomRightX, bottomRightY, pointX, pointY)*1.1);
+
+			// Shadow Triangle
+			draw_vertex(topLeftX - visionDistance * cos(topLeftAngle), topLeftY - visionDistance * sin(topLeftAngle));
+			draw_vertex(topLeftExtendedX, topLeftExtendedY);
+			draw_vertex(topLeftX, topLeftY);
+			
+			// Shadow Triangle
+			draw_vertex(bottomRightX - visionDistance * cos(bottomRightAngle), bottomRightY - visionDistance * sin(bottomRightAngle));
+			draw_vertex(bottomRightExtendedX, bottomRightExtendedY);
+			draw_vertex(bottomRightX, bottomRightY);
+			
+			var topLeftAngle = arctan(getSlope(topLeftX, topLeftY, pointX, pointY)*0.8);
+			var bottomRightAngle = arctan(getSlope(bottomRightX, bottomRightY, pointX, pointY)*1.2);
+
+			// Shadow Triangle
+			draw_vertex(topLeftX - visionDistance * cos(topLeftAngle), topLeftY - visionDistance * sin(topLeftAngle));
+			draw_vertex(topLeftExtendedX, topLeftExtendedY);
+			draw_vertex(topLeftX, topLeftY);
+			
+			// Shadow Triangle
+			draw_vertex(bottomRightX - visionDistance * cos(bottomRightAngle), bottomRightY - visionDistance * sin(bottomRightAngle));
+			draw_vertex(bottomRightExtendedX, bottomRightExtendedY);
+			draw_vertex(bottomRightX, bottomRightY);
+			
+			var topLeftAngle = arctan(getSlope(topLeftX, topLeftY, pointX, pointY)*0.7);
+			var bottomRightAngle = arctan(getSlope(bottomRightX, bottomRightY, pointX, pointY)*1.3);
+
+			// Shadow Triangle
+			draw_vertex(topLeftX - visionDistance * cos(topLeftAngle), topLeftY - visionDistance * sin(topLeftAngle));
+			draw_vertex(topLeftExtendedX, topLeftExtendedY);
+			draw_vertex(topLeftX, topLeftY);
+			
+			// Shadow Triangle
+			draw_vertex(bottomRightX - visionDistance * cos(bottomRightAngle), bottomRightY - visionDistance * sin(bottomRightAngle));
+			draw_vertex(bottomRightExtendedX, bottomRightExtendedY);
+			draw_vertex(bottomRightX, bottomRightY);
+			
+			draw_primitive_end();
+		}
+		else if (pointX < bottomLeftX && pointY > bottomLeftY) // BOTTOM LEFT
+		{
+			draw_set_alpha(1.0);
+
+			draw_primitive_begin(pr_trianglelist);
+			
+			var topLeftAngle = arctan(getSlope(topLeftX, topLeftY, pointX, pointY));
+			var bottomRightAngle = arctan(getSlope(bottomRightX, bottomRightY, pointX, pointY));
+
+			var topLeftExtendedX = topLeftX + visionDistance * cos(topLeftAngle)
+			var topLeftExtendedY = topLeftY + visionDistance * sin(topLeftAngle)
+
+			var bottomRightExtendedX = bottomRightX + visionDistance * cos(bottomRightAngle);
+			var bottomRightExtendedY = bottomRightY + visionDistance * sin(bottomRightAngle);
+
+			// Triangle
+			draw_vertex(topLeftExtendedX, topLeftExtendedY);
+			draw_vertex(topRightX, topRightY);
+			draw_vertex(topLeftX, topLeftY);
+			
+			// Center Triangle
+			draw_vertex(topLeftExtendedX, topLeftExtendedY);
+			draw_vertex(topRightX, topRightY);
+			draw_vertex(bottomRightExtendedX, bottomRightExtendedY);
+			
+			// Triangle
+			draw_vertex(bottomRightX, bottomRightY);
+			draw_vertex(topRightX, topRightY);
+			draw_vertex(bottomRightExtendedX, bottomRightExtendedY);
+			
+			draw_primitive_end();
+			
+			
+			
+			draw_set_alpha(0.25);
+			
+			draw_primitive_begin(pr_trianglelist);
+			
+			var topLeftAngle = arctan(getSlope(topLeftX, topLeftY, pointX, pointY)*1.1);
+			var bottomRightAngle = arctan(getSlope(bottomRightX, bottomRightY, pointX, pointY)*0.9);
+
+			// Shadow Triangle
+			draw_vertex(topLeftX + visionDistance * cos(topLeftAngle), topLeftY + visionDistance * sin(topLeftAngle));
+			draw_vertex(topLeftExtendedX, topLeftExtendedY);
+			draw_vertex(topLeftX, topLeftY);
+			
+			// Shadow Triangle
+			draw_vertex(bottomRightX + visionDistance * cos(bottomRightAngle), bottomRightY + visionDistance * sin(bottomRightAngle));
+			draw_vertex(bottomRightExtendedX, bottomRightExtendedY);
+			draw_vertex(bottomRightX, bottomRightY);
+			
+			var topLeftAngle = arctan(getSlope(topLeftX, topLeftY, pointX, pointY)*1.2);
+			var bottomRightAngle = arctan(getSlope(bottomRightX, bottomRightY, pointX, pointY)*0.8);
+
+			// Shadow Triangle
+			draw_vertex(topLeftX + visionDistance * cos(topLeftAngle), topLeftY + visionDistance * sin(topLeftAngle));
+			draw_vertex(topLeftExtendedX, topLeftExtendedY);
+			draw_vertex(topLeftX, topLeftY);
+			
+			// Shadow Triangle
+			draw_vertex(bottomRightX + visionDistance * cos(bottomRightAngle), bottomRightY + visionDistance * sin(bottomRightAngle));
+			draw_vertex(bottomRightExtendedX, bottomRightExtendedY);
+			draw_vertex(bottomRightX, bottomRightY);
+			
+			var topLeftAngle = arctan(getSlope(topLeftX, topLeftY, pointX, pointY)*1.3);
+			var bottomRightAngle = arctan(getSlope(bottomRightX, bottomRightY, pointX, pointY)*0.7);
+
+			// Shadow Triangle
+			draw_vertex(topLeftX + visionDistance * cos(topLeftAngle), topLeftY + visionDistance * sin(topLeftAngle));
+			draw_vertex(topLeftExtendedX, topLeftExtendedY);
+			draw_vertex(topLeftX, topLeftY);
+			
+			// Shadow Triangle
+			draw_vertex(bottomRightX + visionDistance * cos(bottomRightAngle), bottomRightY + visionDistance * sin(bottomRightAngle));
+			draw_vertex(bottomRightExtendedX, bottomRightExtendedY);
+			draw_vertex(bottomRightX, bottomRightY);
+			
+			draw_primitive_end();
+		}
+		else if (pointX >= bottomRightX && pointY >= bottomRightY) // BOTTOM RIGHT
+		{
+			var topRightAngle = arctan(getSlope(topRightX, topRightY, pointX, pointY));
+			var bottomLeftAngle = arctan(getSlope(bottomLeftX, bottomLeftY, pointX, pointY));
+
+			var topRightExtendedX = topRightX - visionDistance * cos(topRightAngle)
+			var topRightExtendedY = topRightY - visionDistance * sin(topRightAngle)
+
+			var bottomLeftExtendedX = bottomLeftX - visionDistance * cos(bottomLeftAngle);
+			var bottomLeftExtendedY = bottomLeftY - visionDistance * sin(bottomLeftAngle);
+
+			draw_set_alpha(1.0);
+			
+			draw_primitive_begin(pr_trianglelist);
+
+			// Triangle
+			draw_vertex(topRightExtendedX, topRightExtendedY);
+			draw_vertex(topLeftX, topLeftY);
+			draw_vertex(topRightX, topRightY);
+			
+			// Center Triangle
+			draw_vertex(topRightExtendedX, topRightExtendedY);
+			draw_vertex(topLeftX, topLeftY);
+			draw_vertex(bottomLeftExtendedX, bottomLeftExtendedY);
+			
+			// Triangle
+			draw_vertex(bottomLeftX, bottomLeftY);
+			draw_vertex(topLeftX, topLeftY);
+			draw_vertex(bottomLeftExtendedX, bottomLeftExtendedY);
+			
+			draw_primitive_end();
+			
+			
+			
+			draw_set_alpha(0.25);
+			
+			draw_primitive_begin(pr_trianglelist);
+			
+			topRightAngle = arctan(getSlope(topRightX, topRightY, pointX, pointY)*1.1);
+			bottomLeftAngle = arctan(getSlope(bottomLeftX, bottomLeftY, pointX, pointY)*0.9);
+
+			// Shadow Triangle
+			draw_vertex(topRightX - visionDistance * cos(topRightAngle), topRightY - visionDistance * sin(topRightAngle));
+			draw_vertex(topRightExtendedX, topRightExtendedY);
+			draw_vertex(topRightX, topRightY);
+			
+			// Shadow Triangle
+			draw_vertex(bottomLeftX - visionDistance * cos(bottomLeftAngle), bottomLeftY - visionDistance * sin(bottomLeftAngle));
+			draw_vertex(bottomLeftExtendedX, bottomLeftExtendedY);
+			draw_vertex(bottomLeftX, bottomLeftY);
+			
+			topRightAngle = arctan(getSlope(topRightX, topRightY, pointX, pointY)*1.2);
+			bottomLeftAngle = arctan(getSlope(bottomLeftX, bottomLeftY, pointX, pointY)*0.8);
+
+			// Shadow Triangle
+			draw_vertex(topRightX - visionDistance * cos(topRightAngle), topRightY - visionDistance * sin(topRightAngle));
+			draw_vertex(topRightExtendedX, topRightExtendedY);
+			draw_vertex(topRightX, topRightY);
+			
+			// Shadow Triangle
+			draw_vertex(bottomLeftX - visionDistance * cos(bottomLeftAngle), bottomLeftY - visionDistance * sin(bottomLeftAngle));
+			draw_vertex(bottomLeftExtendedX, bottomLeftExtendedY);
+			draw_vertex(bottomLeftX, bottomLeftY);
+			
+			topRightAngle = arctan(getSlope(topRightX, topRightY, pointX, pointY)*1.3);
+			bottomLeftAngle = arctan(getSlope(bottomLeftX, bottomLeftY, pointX, pointY)*0.7);
+
+			// Shadow Triangle
+			draw_vertex(topRightX - visionDistance * cos(topRightAngle), topRightY - visionDistance * sin(topRightAngle));
+			draw_vertex(topRightExtendedX, topRightExtendedY);
+			draw_vertex(topRightX, topRightY);
+			
+			// Shadow Triangle
+			draw_vertex(bottomLeftX - visionDistance * cos(bottomLeftAngle), bottomLeftY - visionDistance * sin(bottomLeftAngle));
+			draw_vertex(bottomLeftExtendedX, bottomLeftExtendedY);
+			draw_vertex(bottomLeftX, bottomLeftY);
+
+			draw_primitive_end();
+		}
+		else if (pointX >= topLeftX && pointX <= topRightX && pointY <= topLeftY) // TOP
+		{
+			var topRightAngle = arctan(getSlope(topRightX, topRightY, pointX, pointY));
+			var topLeftAngle = arctan(getSlope(topLeftX, topLeftY, pointX, pointY));
+
+			var topRightExtendedX = topRightX + visionDistance * cos(topRightAngle)
+			var topRightExtendedY = topRightY + visionDistance * sin(topRightAngle)
+
+			var topLeftExtendedX = topLeftX - visionDistance * cos(topLeftAngle);
+			var topLeftExtendedY = topLeftY - visionDistance * sin(topLeftAngle);
+
+			draw_set_alpha(1.0);
+			
+			draw_primitive_begin(pr_trianglelist);
+
+			// Left Edge Triangle
+			draw_vertex(topLeftExtendedX, topLeftExtendedY);
+			draw_vertex(topLeftX, topLeftY);
+			draw_vertex(bottomLeftX, bottomLeftY);
+			
+			// Right Edge Triangle
+			draw_vertex(topRightExtendedX, topRightExtendedY);
+			draw_vertex(bottomRightX, bottomRightY);
+			draw_vertex(topRightX, topRightY);
+			
+			// Triangle
+			draw_vertex(topRightExtendedX, topRightExtendedY);
+			draw_vertex(bottomLeftX, bottomLeftY);
+			draw_vertex(bottomRightX, bottomRightY);
+
+			// Large Triangle
+			draw_vertex(topLeftExtendedX, topLeftExtendedY);
+			draw_vertex(bottomLeftX, bottomLeftY);
+			draw_vertex(topRightExtendedX, topRightExtendedY);
+
+			draw_primitive_end();
+			
+			
+			
+			draw_set_alpha(0.25);
+			
+			draw_primitive_begin(pr_trianglelist);
+			
+			topLeftAngle = arctan(getSlope(topLeftX, topLeftY, pointX, pointY)*0.9);
+			topRightAngle = arctan(getSlope(topRightX, topRightY, pointX, pointY)*0.9);
+
+			// Shadow Triangle
+			draw_vertex(topRightX + visionDistance * cos(topRightAngle), topRightY + visionDistance * sin(topRightAngle));
+			draw_vertex(topRightExtendedX, topRightExtendedY);
+			draw_vertex(topRightX, topRightY);
+			
+			// Shadow Triangle
+			draw_vertex(topLeftX - visionDistance * cos(topLeftAngle), topLeftY - visionDistance * sin(topLeftAngle));
+			draw_vertex(topLeftExtendedX, topLeftExtendedY);
+			draw_vertex(topLeftX, topLeftY);
+			
+			topLeftAngle = arctan(getSlope(topLeftX, topLeftY, pointX, pointY)*0.8);
+			topRightAngle = arctan(getSlope(topRightX, topRightY, pointX, pointY)*0.8);
+
+			// Shadow Triangle
+			draw_vertex(topRightX + visionDistance * cos(topRightAngle), topRightY + visionDistance * sin(topRightAngle));
+			draw_vertex(topRightExtendedX, topRightExtendedY);
+			draw_vertex(topRightX, topRightY);
+			
+			// Shadow Triangle
+			draw_vertex(topLeftX - visionDistance * cos(topLeftAngle), topLeftY - visionDistance * sin(topLeftAngle));
+			draw_vertex(topLeftExtendedX, topLeftExtendedY);
+			draw_vertex(topLeftX, topLeftY);
+			
+			topLeftAngle = arctan(getSlope(topLeftX, topLeftY, pointX, pointY)*0.7);
+			topRightAngle = arctan(getSlope(topRightX, topRightY, pointX, pointY)*0.7);
+
+			// Shadow Triangle
+			draw_vertex(topRightX + visionDistance * cos(topRightAngle), topRightY + visionDistance * sin(topRightAngle));
+			draw_vertex(topRightExtendedX, topRightExtendedY);
+			draw_vertex(topRightX, topRightY);
+			
+			// Shadow Triangle
+			draw_vertex(topLeftX - visionDistance * cos(topLeftAngle), topLeftY - visionDistance * sin(topLeftAngle));
+			draw_vertex(topLeftExtendedX, topLeftExtendedY);
+			draw_vertex(topLeftX, topLeftY);
+
+			draw_primitive_end();
+		}
+		else if (pointX >= bottomLeftX && pointX <= bottomRightX && pointY >= bottomLeftY) // BOTTOM
+		{
+			var bottomRightAngle = arctan(getSlope(bottomRightX, bottomRightY, pointX, pointY));
+			var bottomLeftAngle = arctan(getSlope(bottomLeftX, bottomLeftY, pointX, pointY));
+
+			var bottomRightExtendedX = bottomRightX + visionDistance * cos(bottomRightAngle)
+			var bottomRightExtendedY = bottomRightY + visionDistance * sin(bottomRightAngle)
+
+			var bottomLeftExtendedX = bottomLeftX - visionDistance * cos(bottomLeftAngle);
+			var bottomLeftExtendedY = bottomLeftY - visionDistance * sin(bottomLeftAngle);
+
+			draw_set_alpha(1.0);
+			
+			draw_primitive_begin(pr_trianglelist);
+
+			// Left Edge Triangle
+			draw_vertex(bottomLeftExtendedX, bottomLeftExtendedY);
+			draw_vertex(topLeftX, topLeftY);
+			draw_vertex(bottomLeftX, bottomLeftY);
+			
+			// Right Edge Triangle
+			draw_vertex(bottomRightExtendedX, bottomRightExtendedY);
+			draw_vertex(bottomRightX, bottomRightY);
+			draw_vertex(topRightX, topRightY);
+			
+			// Triangle
+			draw_vertex(bottomLeftExtendedX, bottomLeftExtendedY);
+			draw_vertex(topLeftX, topLeftY);
+			draw_vertex(topRightX, topRightY);
+
+			// Large Triangle
+			draw_vertex(bottomLeftExtendedX, bottomLeftExtendedY);
+			draw_vertex(topRightX, topRightY);
+			draw_vertex(bottomRightExtendedX, bottomRightExtendedY);
+
+			draw_primitive_end();
+			
+			
+			
+			draw_set_alpha(0.25);
+			
+			draw_primitive_begin(pr_trianglelist);
+			
+			bottomLeftAngle = arctan(getSlope(bottomLeftX, bottomLeftY, pointX, pointY)*0.9);
+			bottomRightAngle = arctan(getSlope(bottomRightX, bottomRightY, pointX, pointY)*0.9);
+
+			// Shadow Triangle
+			draw_vertex(bottomRightX + visionDistance * cos(bottomRightAngle), bottomRightY + visionDistance * sin(bottomRightAngle));
+			draw_vertex(bottomRightExtendedX, bottomRightExtendedY);
+			draw_vertex(bottomRightX, bottomRightY);
+			
+			// Shadow Triangle
+			draw_vertex(bottomLeftX - visionDistance * cos(bottomLeftAngle), bottomLeftY - visionDistance * sin(bottomLeftAngle));
+			draw_vertex(bottomLeftExtendedX, bottomLeftExtendedY);
+			draw_vertex(bottomLeftX, bottomLeftY);
+			
+			bottomLeftAngle = arctan(getSlope(bottomLeftX, bottomLeftY, pointX, pointY)*0.8);
+			bottomRightAngle = arctan(getSlope(bottomRightX, bottomRightY, pointX, pointY)*0.8);
+
+			// Shadow Triangle
+			draw_vertex(bottomRightX + visionDistance * cos(bottomRightAngle), bottomRightY + visionDistance * sin(bottomRightAngle));
+			draw_vertex(bottomRightExtendedX, bottomRightExtendedY);
+			draw_vertex(bottomRightX, bottomRightY);
+			
+			// Shadow Triangle
+			draw_vertex(bottomLeftX - visionDistance * cos(bottomLeftAngle), bottomLeftY - visionDistance * sin(bottomLeftAngle));
+			draw_vertex(bottomLeftExtendedX, bottomLeftExtendedY);
+			draw_vertex(bottomLeftX, bottomLeftY);
+			
+			bottomLeftAngle = arctan(getSlope(bottomLeftX, bottomLeftY, pointX, pointY)*0.7);
+			bottomRightAngle = arctan(getSlope(bottomRightX, bottomRightY, pointX, pointY)*0.7);
+
+			// Shadow Triangle
+			draw_vertex(bottomRightX + visionDistance * cos(bottomRightAngle), bottomRightY + visionDistance * sin(bottomRightAngle));
+			draw_vertex(bottomRightExtendedX, bottomRightExtendedY);
+			draw_vertex(bottomRightX, bottomRightY);
+			
+			// Shadow Triangle
+			draw_vertex(bottomLeftX - visionDistance * cos(bottomLeftAngle), bottomLeftY - visionDistance * sin(bottomLeftAngle));
+			draw_vertex(bottomLeftExtendedX, bottomLeftExtendedY);
+			draw_vertex(bottomLeftX, bottomLeftY);
+
+			draw_primitive_end();
+		}
+		else if (pointY >= topLeftY && pointY <= bottomLeftY && pointX <= topLeftX) // LEFT
+		{
+			var topLeftAngle = arctan(getSlope(topLeftX, topLeftY, pointX, pointY));
+			var bottomLeftAngle = arctan(getSlope(bottomLeftX, bottomLeftY, pointX, pointY));
+
+			var topLeftExtendedX = topLeftX + visionDistance * cos(topLeftAngle)
+			var topLeftExtendedY = topLeftY + visionDistance * sin(topLeftAngle)
+
+			var bottomLeftExtendedX = bottomLeftX + visionDistance * cos(bottomLeftAngle);
+			var bottomLeftExtendedY = bottomLeftY + visionDistance * sin(bottomLeftAngle);
+
+			draw_set_alpha(1.0);
+			
+			draw_primitive_begin(pr_trianglelist);
+
+			// Top Edge Triangle
+			draw_vertex(topLeftExtendedX, topLeftExtendedY);
+			draw_vertex(topRightX, topRightY);
+			draw_vertex(topLeftX, topLeftY);
+			
+			// Bottom Edge Triangle
+			draw_vertex(bottomLeftExtendedX, bottomLeftExtendedY);
+			draw_vertex(bottomLeftX, bottomLeftY);
+			draw_vertex(bottomRightX, bottomRightY);
+			
+			// Triangle
+			draw_vertex(topLeftExtendedX, topLeftExtendedY);
+			draw_vertex(bottomRightX, bottomRightY);
+			draw_vertex(topRightX, topRightY);
+
+			// Large Triangle
+			draw_vertex(bottomLeftExtendedX, bottomLeftExtendedY);
+			draw_vertex(bottomRightX, bottomRightY);
+			draw_vertex(topLeftExtendedX, topLeftExtendedY);
+			
+			draw_primitive_end();
+			
+			
+			
+			draw_set_alpha(0.25);
+			
+			draw_primitive_begin(pr_trianglelist);
+			
+			bottomLeftAngle = arctan(getSlope(bottomLeftX, bottomLeftY, pointX, pointY)*1.1);
+			topLeftAngle = arctan(getSlope(topLeftX, topLeftY, pointX, pointY)*1.1);
+
+			// Shadow Triangle
+			draw_vertex(topLeftX + visionDistance * cos(topLeftAngle), topLeftY + visionDistance * sin(topLeftAngle));
+			draw_vertex(topLeftExtendedX, topLeftExtendedY);
+			draw_vertex(topLeftX, topLeftY);
+			
+			// Shadow Triangle
+			draw_vertex(bottomLeftX + visionDistance * cos(bottomLeftAngle), bottomLeftY + visionDistance * sin(bottomLeftAngle));
+			draw_vertex(bottomLeftExtendedX, bottomLeftExtendedY);
+			draw_vertex(bottomLeftX, bottomLeftY);
+			
+			bottomLeftAngle = arctan(getSlope(bottomLeftX, bottomLeftY, pointX, pointY)*1.2);
+			topLeftAngle = arctan(getSlope(topLeftX, topLeftY, pointX, pointY)*1.2);
+
+			// Shadow Triangle
+			draw_vertex(topLeftX + visionDistance * cos(topLeftAngle), topLeftY + visionDistance * sin(topLeftAngle));
+			draw_vertex(topLeftExtendedX, topLeftExtendedY);
+			draw_vertex(topLeftX, topLeftY);
+			
+			// Shadow Triangle
+			draw_vertex(bottomLeftX + visionDistance * cos(bottomLeftAngle), bottomLeftY + visionDistance * sin(bottomLeftAngle));
+			draw_vertex(bottomLeftExtendedX, bottomLeftExtendedY);
+			draw_vertex(bottomLeftX, bottomLeftY);
+			
+			bottomLeftAngle = arctan(getSlope(bottomLeftX, bottomLeftY, pointX, pointY)*1.3);
+			topLeftAngle = arctan(getSlope(topLeftX, topLeftY, pointX, pointY)*1.3);
+
+			// Shadow Triangle
+			draw_vertex(topLeftX + visionDistance * cos(topLeftAngle), topLeftY + visionDistance * sin(topLeftAngle));
+			draw_vertex(topLeftExtendedX, topLeftExtendedY);
+			draw_vertex(topLeftX, topLeftY);
+			
+			// Shadow Triangle
+			draw_vertex(bottomLeftX + visionDistance * cos(bottomLeftAngle), bottomLeftY + visionDistance * sin(bottomLeftAngle));
+			draw_vertex(bottomLeftExtendedX, bottomLeftExtendedY);
+			draw_vertex(bottomLeftX, bottomLeftY);
+			
+			draw_primitive_end();
+		}
+		else if (pointY >= topRightY && pointY <= bottomRightY && pointX >= topRightX) // RIGHT
+		{
+			var topRightAngle = arctan(getSlope(topRightX, topRightY, pointX, pointY));
+			var bottomRightAngle = arctan(getSlope(bottomRightX, bottomRightY, pointX, pointY));
+
+			var topRightExtendedX = topRightX - visionDistance * cos(topRightAngle)
+			var topRightExtendedY = topRightY - visionDistance * sin(topRightAngle)
+
+			var bottomRightExtendedX = bottomRightX - visionDistance * cos(bottomRightAngle);
+			var bottomRightExtendedY = bottomRightY - visionDistance * sin(bottomRightAngle);
+
+			draw_set_alpha(1.0);
+			
+			draw_primitive_begin(pr_trianglelist);
+
+			// Top Edge Triangle
+			draw_vertex(topRightExtendedX, topRightExtendedY);
+			draw_vertex(topRightX, topRightY);
+			draw_vertex(topLeftX, topLeftY);
+			
+			// Bottom Edge Triangle
+			draw_vertex(bottomRightExtendedX, bottomRightExtendedY);
+			draw_vertex(bottomLeftX, bottomLeftY);
+			draw_vertex(bottomRightX, bottomRightY);
+			
+			// Triangle
+			draw_vertex(bottomRightExtendedX, bottomRightExtendedY);
+			draw_vertex(topLeftX, topLeftY);
+			draw_vertex(bottomLeftX, bottomLeftY);
+			
+			// Large Triangle
+			draw_vertex(topRightExtendedX, topRightExtendedY);
+			draw_vertex(bottomRightExtendedX, bottomRightExtendedY);
+			draw_vertex(topLeftX, topLeftY);
+
+			draw_primitive_end();
+			
+			
+			
+			draw_set_alpha(0.25);
+			
+			draw_primitive_begin(pr_trianglelist);
+			
+			bottomRightAngle = arctan(getSlope(bottomRightX, bottomRightY, pointX, pointY)*1.1);
+			topRightAngle = arctan(getSlope(topRightX, topRightY, pointX, pointY)*1.1);
+
+			// Shadow Triangle
+			draw_vertex(topRightX - visionDistance * cos(topRightAngle), topRightY - visionDistance * sin(topRightAngle));
+			draw_vertex(topRightExtendedX, topRightExtendedY);
+			draw_vertex(topRightX, topRightY);
+			
+			// Shadow Triangle
+			draw_vertex(bottomRightX - visionDistance * cos(bottomRightAngle), bottomRightY - visionDistance * sin(bottomRightAngle));
+			draw_vertex(bottomRightExtendedX, bottomRightExtendedY);
+			draw_vertex(bottomRightX, bottomRightY);
+			
+			bottomRightAngle = arctan(getSlope(bottomRightX, bottomRightY, pointX, pointY)*1.2);
+			topRightAngle = arctan(getSlope(topRightX, topRightY, pointX, pointY)*1.2);
+
+			// Shadow Triangle
+			draw_vertex(topRightX - visionDistance * cos(topRightAngle), topRightY - visionDistance * sin(topRightAngle));
+			draw_vertex(topRightExtendedX, topRightExtendedY);
+			draw_vertex(topRightX, topRightY);
+			
+			// Shadow Triangle
+			draw_vertex(bottomRightX - visionDistance * cos(bottomRightAngle), bottomRightY - visionDistance * sin(bottomRightAngle));
+			draw_vertex(bottomRightExtendedX, bottomRightExtendedY);
+			draw_vertex(bottomRightX, bottomRightY);
+			
+			bottomRightAngle = arctan(getSlope(bottomRightX, bottomRightY, pointX, pointY)*1.3);
+			topRightAngle = arctan(getSlope(topRightX, topRightY, pointX, pointY)*1.3);
+
+			// Shadow Triangle
+			draw_vertex(topRightX - visionDistance * cos(topRightAngle), topRightY - visionDistance * sin(topRightAngle));
+			draw_vertex(topRightExtendedX, topRightExtendedY);
+			draw_vertex(topRightX, topRightY);
+			
+			// Shadow Triangle
+			draw_vertex(bottomRightX - visionDistance * cos(bottomRightAngle), bottomRightY - visionDistance * sin(bottomRightAngle));
+			draw_vertex(bottomRightExtendedX, bottomRightExtendedY);
+			draw_vertex(bottomRightX, bottomRightY);
+			
+			draw_primitive_end();
+		}
+		else
+		{
+			// Do nothing!
+		}
+
+	    // Add the wall ID to the processed walls DS list
+	    ds_list_add(processedWalls, wall.id);
+	}
+}
